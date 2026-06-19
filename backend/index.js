@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import connection from './config/db.js';
 import agentRoutes from './routes/userRoutes.js'
 import propertyRoutes from './routes/propertyroute.js'
-import productRoutes from './routes/productrouter.js'
+import productRoutes from './routes/productRouter.js'
 import serviceRoutes from './routes/serviceRouter.js'
 
 dotenv.config() 
