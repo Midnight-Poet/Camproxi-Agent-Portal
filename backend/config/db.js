@@ -15,7 +15,7 @@ const connection = async () => {
 		log('successfully connected');
         
 	} catch (error) {
-		console.error(`Error: ${error.message}`);
+		console.error(`Error: ${error} from connection`);
 		process.exit(1);
 	}
 };
