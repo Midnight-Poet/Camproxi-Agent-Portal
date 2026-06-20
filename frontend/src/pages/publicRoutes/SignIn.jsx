@@ -70,7 +70,7 @@ export default function SignIn() {
 			dispatch(setCredientials({...res}))
 			navigate('/dashboard');
 		} catch (err) {
-			loginValidation(await error?.data?.message || await error.message)
+			loginValidation(await err?.data?.message || await err.message)
 			console.log(await err)
 		}
 	};
