@@ -195,6 +195,7 @@ export default function Onboarding() {
 		setAgentType,
 		passwordValidation,
 		formValidation,
+		loginValidation,
 		deleteListing,
 		flash,
 		toast,
@@ -260,6 +261,10 @@ export default function Onboarding() {
 			dispatch(setCredientials({ ...res }));
 			navigate('/dashboard');
 		} catch (err) {
+			loginValidation(
+				(await error?.data?.message) || (await error.message),
+			);
+
 			console.log(err);
 		}
 	};
