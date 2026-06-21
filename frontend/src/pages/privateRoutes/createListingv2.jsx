@@ -11,6 +11,7 @@ import Layout from '../../components/Layout';
 import Loading from '../../components/Loading';
 import Toast from '../../components/Toast';
 import { useApp } from '../../context/AppContext';
+import imageCompression from 'browser-image-compression';
 import {
 	AMENITIES,
 	ROOM_TYPES,
@@ -227,7 +228,7 @@ export default function CreateListing2({ setState, id }) {
 				const lat = position.coords.latitude;
 				const lng = position.coords.longitude;
 				setCurrentLocation({ lat, lng });
-				setForm(prev => ({...prev, lat: lat, lng: lng}))
+				setForm((prev) => ({ ...prev, lat: lat, lng: lng }));
 				// console.log(lat, lng);
 			},
 			(error) => {
@@ -356,13 +357,35 @@ export default function CreateListing2({ setState, id }) {
 					? formData.append('productId', editing.productId)
 					: formData.append('propertyId', editing.propertyId);
 		}
-		newPhotos.forEach((photo, index) => {
-			const fileName = photo.file.name
-				.split('.')[0]
-				.replace(/[^\w\-]+/g, '');
-			index === 0 ? formData.append('coverImage', fileName) : null;
-			formData.append(`images`, photo.file);
-		});
+		// newPhotos.forEach(async (photo, index) => {
+		// 	const fileName = photo.file.name
+		// 		.split('.')[0]
+		// 		.replace(/[^\w\-]+/g, '');
+		// 	index === 0 ? formData.append('coverImage', fileName) : null;
+		// 	const image = await imageCompression(photo.file, {
+		//       maxSizeMB: 1,
+		//       maxWidthOrHeight: 1600,
+		//       useWebWorker: true,
+		//     })
+		// 	formData.append(`images`, await image);
+		// });
+		await Promise.all(
+			newPhotos.map(async (photo, index) => {
+				const fileName = photo.file.name
+					.split('.')[0]
+					.replace(/[^\w\-]+/g, '');
+
+				if (index === 0) formData.append('coverImage', fileName);
+
+				const image = await imageCompression(photo.file, {
+					maxSizeMB: 1,
+					maxWidthOrHeight: 1600,
+					useWebWorker: true,
+				});
+
+				formData.append('images', image);
+			}),
+		);
 		id ? formData.append('id', id) : null;
 		let publicIds = [];
 		removedPhotos.forEach(

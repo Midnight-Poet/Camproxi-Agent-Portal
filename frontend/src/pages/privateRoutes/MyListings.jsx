@@ -20,6 +20,7 @@ import { useSelector } from 'react-redux';
 import Spinner from '../../components/spinner';
 import { useDeleteServiceMutation, useGetAllServiceQuery } from '../../redux/api/serviceApiSlice';
 import Loading from '../../components/Loading';
+import imageCompression from 'browser-image-compression';
 
 const FILTERS = [
 	{ id: 'all', label: 'All' },
