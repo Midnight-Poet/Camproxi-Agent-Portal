@@ -265,7 +265,7 @@ export default function MyListings() {
 					</button>
 				</div>
 
-				<div className='flex-1 overflow-y-auto'>
+				<div className='flex-1 overflow-y-auto w-full'>
 					{loading ? (
 						<Spinner />
 					) : shown?.length === 0 ? (
@@ -300,7 +300,7 @@ export default function MyListings() {
 							}
 						</div>
 					) : (
-						<div className='px-[18px] py-[18px] pb-7 flex flex-wrap items-center gap-5 [&>div]:w-[32%]'>
+						<div className='px-[18px] py-[18px] pb-7 flex flex-wrap items-center gap-5 md:[&>div]:w-[32%] sm:[&>div]:w-[48%] [&>div]:w-full'>
 							{shown?.map((l) => (
 								<RichCard
 									key={l._id}

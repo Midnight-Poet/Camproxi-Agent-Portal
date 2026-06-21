@@ -34,7 +34,7 @@ function AgentTypeCard({ t, selected, onClick }) {
 	return (
 		<div
 			onClick={onClick}
-			className={`relative flex sm:flex-col items-center gap-3.5 w-full text-left p-5 rounded-card cursor-pointer mb-3 border-[1.5px] transition-all duration-150 ${
+			className={`relative flex flex-col items-center gap-3.5 w-full text-left p-5 rounded-card cursor-pointer mb-3 border-[1.5px] transition-all duration-150 ${
 				selected
 					? 'border-primary bg-primary-tint shadow-[0_0_0_3px_rgba(13,122,114,0.13)]'
 					: 'border-line2 bg-white shadow-sm2'
@@ -56,7 +56,7 @@ function AgentTypeCard({ t, selected, onClick }) {
 				<div className='text-sm text-muted mt-0.5'>{t.blurb}</div>
 			</div>
 			<div
-				className={`w-[22px] sm:absolute sm:top-2 sm:right-2 h-[22px] rounded-full flex-shrink-0 flex items-center justify-center ${
+				className={`w-[22px] absolute top-2 right-2 h-[22px] rounded-full flex-shrink-0 flex items-center justify-center ${
 					selected
 						? 'bg-primary border-0'
 						: 'bg-transparent border-2 border-line'
@@ -296,7 +296,7 @@ export default function Onboarding() {
 			<p className='text-muted text-sm mb-5'>
 				Pick the type that fits you best. You can list more later.
 			</p>
-			<div className='flex items-center justify-between gap-3'>
+			<div className='flex items-center justify-between gap-3 sm:flex-row flex-col'>
 				{AGENT_TYPES.map((t) => (
 					<AgentTypeCard
 						key={t.id}
@@ -320,7 +320,7 @@ export default function Onboarding() {
 				Tell us about you
 			</h2> */}
 			<div className='w-full flex items-center justify-between flex-wrap gap-[1%]'>
-				<Field label='First name' className={`w-[49%]`}>
+				<Field label='First name' className={`w-full sm:w-[49%]`}>
 					<input
 						className={inputCls}
 						placeholder='e.g. Adaeze'
@@ -328,7 +328,7 @@ export default function Onboarding() {
 						onChange={set('firstName')}
 					/>
 				</Field>
-				<Field label='last name' className={`w-[49%]`}>
+				<Field label='last name' className={`w-full sm:w-[49%]`}>
 					<input
 						className={inputCls}
 						placeholder='e.g. Okafor'
@@ -336,7 +336,7 @@ export default function Onboarding() {
 						onChange={set('lastName')}
 					/>
 				</Field>
-				<Field label='username' className={`w-[49%]`}>
+				<Field label='username' className={`w-full sm:w-[49%]`}>
 					<input
 						className={inputCls}
 						// placeholder='e.g. Okafor'
@@ -345,7 +345,7 @@ export default function Onboarding() {
 					/>
 				</Field>
 				<Field
-					className={`w-[49%]`}
+					className={`w-full sm:w-[49%]`}
 					label={
 						agent === 'landlord'
 							? 'agency / Company name'
@@ -368,7 +368,7 @@ export default function Onboarding() {
 						onChange={set('email')}
 					/>
 				</Field>
-				<Field label='Phone' className={`w-[49%]`}>
+				<Field label='Phone' className={`w-full sm:w-[49%]`}>
 					<input
 						className={inputCls}
 						type='tel'
@@ -377,7 +377,7 @@ export default function Onboarding() {
 						onChange={set('phone')}
 					/>
 				</Field>
-				<Field label='Whatsapp' opt className={`w-[49%]`}>
+				<Field label='Whatsapp' opt className={`w-full sm:w-[49%]`}>
 					<input
 						className={inputCls}
 						type='tel'
@@ -399,7 +399,7 @@ export default function Onboarding() {
 						/>
 					</div>
 				</Field>
-				<Field label='Password' className={`w-[49%] `}>
+				<Field label='Password' className={`w-full sm:w-[49%] `}>
 					<div
 						className={`w-full text-[15px] pr-2 text-ink bg-white border-[1.5px] border-line rounded-md2 overflow-hidden transition-all duration-500 focus-within::border-primary placeholder:text-faint flex items-center gap-1`}
 					>
@@ -417,7 +417,7 @@ export default function Onboarding() {
 						</div>
 					</div>
 				</Field>
-				<Field label='confirm Password' className={`w-[49%] `}>
+				<Field label='confirm Password' className={`w-full sm:w-[49%] `}>
 					<div
 						className={`w-full text-[15px] pr-2 text-ink bg-white border-[1.5px] border-line rounded-md2 overflow-hidden transition-all duration-500 focus-within::border-primary placeholder:text-faint flex items-center gap-1`}
 					>
@@ -464,7 +464,7 @@ export default function Onboarding() {
 	return (
 		<div className='min-h-screen bg-bg flex'>
 			<DesktopBrandPanel />
-			<form action='' className='w-3/5 h-full flex flex-col'>
+			<form action='' className='md:w-3/5 w-full h-full flex flex-col'>
 				<div className='flex-1 flex flex-col overflow-hidden'>
 					{/* Progress header */}
 					<header className='flex-none py-4 px-5 bg-white'>
