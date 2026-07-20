@@ -85,7 +85,7 @@ export default function Onboarding() {
 
 	const [registerUser, { isSuccess, isError, isLoading, error }] =
 		useRegisterMutation();
-	const { data: schoolsData, isLoading: schoolsLoading, isError: schoolsError } = useGetSchoolsQuery();
+	const { data: schoolsData, isLoading: schoolsLoading, error: schoolsError } = useGetSchoolsQuery();
 	useEffect(() => {
 		console.log(schoolsData)
 		console.log(schoolsLoading)
