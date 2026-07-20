@@ -1,4 +1,4 @@
-export const BASE_URL = process.env.BACKEND_URL || ''
+export const BASE_URL = import.meta.env.BACKEND_URL || ''
 export const AGENTS_URL = '/api/agent'
 export const PROPERTY_URL = '/api/agent/properties'
 export const PRODUCT_URL = '/api/agent/products'
