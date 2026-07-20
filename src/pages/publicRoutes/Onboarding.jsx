@@ -85,7 +85,12 @@ export default function Onboarding() {
 
 	const [registerUser, { isSuccess, isError, isLoading, error }] =
 		useRegisterMutation();
-	const { data: schoolsData, isLoading: schoolsLoading } = useGetSchoolsQuery();
+	const { data: schoolsData, isLoading: schoolsLoading, isError: schoolsError } = useGetSchoolsQuery();
+	useEffect(() => {
+		console.log(schoolsData)
+		console.log(schoolsLoading)
+		console.log(schoolsError)
+	}, [schoolsData, schoolsLoading, schoolsError])
 	const {
 		setAgentType,
 		passwordValidation,
@@ -191,7 +196,6 @@ export default function Onboarding() {
 
 	const verifyLocation = (e) => {
 		e?.preventDefault();
-		console.log("it's working")
 		if (!schoolsData) return;
 		
 		setLocationLoading(true);
