@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  /* Very subtle, cool-toned bright background */
+  background-color: #f8faf9;
+  background-image: radial-gradient(at 0% 0%, hsla(175, 40%, 96%, 1) 0px, transparent 50%),
+                    radial-gradient(at 100% 0%, hsla(160, 40%, 98%, 1) 0px, transparent 50%);
+  background-attachment: fixed;
+  font-family: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: #14201e;
+}
+
+#root {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Glassmorphism Utility */
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-sm2;
+  }
+  .glass-heavy {
+    @apply bg-white/85 backdrop-blur-lg border border-white/60 shadow-md2;
+  }
+}
+
+/* Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d2ebe8;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0d7a72;
+}
+
+/* Scrollbar hide utility */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Input focus ring using primary color */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+}

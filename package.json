@@ -1,36 +1,37 @@
 {
-  "name": "agentuser",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "backend": "nodemon backend/index.js",
-    "frontend": "npm run dev --prefix frontend",
-    "dev": "concurrently \"npm run frontend\" \"npm run backend\""
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "name": "camproxi",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
+    "@googlemaps/js-api-loader": "^2.1.1",
+    "@reduxjs/toolkit": "^2.12.0",
     "browser-image-compression": "^2.0.2",
-    "cloudinary": "^2.10.0",
-    "concurrently": "^9.2.1",
-    "cookie-parser": "^1.4.7",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "express-async-handler": "^1.2.0",
-    "express-formidable": "^1.2.0",
-    "firebase-admin": "^13.10.0",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.6.3",
-    "multer": "^2.1.1",
-    "multer-storage-cloudinary": "^2.2.1",
-    "nodemon": "^3.1.14",
-    "uuid": "^14.0.0"
+    "lucide-react": "^1.17.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-redux": "^9.3.0",
+    "react-router-dom": "^7.16.0"
   },
   "devDependencies": {
-    "vite": "^8.0.16"
+    "@eslint/js": "^10.0.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "autoprefixer": "^10.5.0",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
+    "playwright": "^1.60.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^3.4.19",
+    "vite": "^8.0.12"
   }
 }

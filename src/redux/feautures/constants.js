@@ -1,0 +1,11 @@
+export const BASE_URL = ''
+export const AGENTS_URL = '/api/agent'
+export const PROPERTY_URL = '/api/agent/properties'
+export const PRODUCT_URL = '/api/agent/products'
+export const SERVICE_URL = '/api/agent/services'
+export const UPLOAD_URL = '/api/upload'
+export const ADMIN_URL = '/api/admin'
+export const REQUESTS_URL = '/api/agent/requests'
+export const NOTIFICATIONS_URL = '/api/agent/notifications'
+export const REVIEWS_URL = '/api/agent/reviews'
+
