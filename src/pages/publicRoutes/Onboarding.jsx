@@ -191,6 +191,7 @@ export default function Onboarding() {
 
 	const verifyLocation = (e) => {
 		e?.preventDefault();
+		console.log("it's working")
 		if (!schoolsData) return;
 		
 		setLocationLoading(true);
