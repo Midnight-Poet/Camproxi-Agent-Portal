@@ -286,7 +286,11 @@ export default function CreateListing2({ setState, id }) {
 			return false;
 		}
 
-		if (photos.length === 0) {
+		if (category === 'landlord' && photos.length !== 5) {
+			showToast('Exactly 5 photos are required for properties', true);
+			return false;
+		}
+		if (category !== 'landlord' && photos.length === 0) {
 			showToast('Add at least one photo', true);
 			return false;
 		}
@@ -390,10 +394,14 @@ export default function CreateListing2({ setState, id }) {
 			(item) => (publicIds = [...publicIds, item.public_id]),
 		);
 		// console.log(publicIds )
-		// removedPhotos.forEach(item => {
-		// 	const publicIds = item.public_id
+		// })
 		formData.append('publicIds', JSON.stringify(publicIds));
 		// })
+
+		if (!id) {
+			const agentSchoolId = userInfo?.schoolId || userInfo?.school?._id || userInfo?.school?.id;
+			if (agentSchoolId) formData.append('schoolId', agentSchoolId);
+		}
 
 		// Category-specific fields
 		if (category === 'landlord') {
@@ -646,10 +654,9 @@ export default function CreateListing2({ setState, id }) {
 							)}
 						</div>
 
-						{/* Photos Section */}
 						<SectionLabel icon='camera'>Photos</SectionLabel>
 						<p className='text-muted text-[12.5px] -mt-1.5 mb-3.5'>
-							First photo is your cover. Add up to 8.
+							First photo is your cover. {category === 'landlord' ? 'Exactly 5 photos required.' : 'Add at least 1 photo.'}
 						</p>
 						<PhotoGallery
 							photos={photos}

@@ -92,11 +92,6 @@ export default function Profile() {
 										navigate('/profile/verification')
 									}
 								/>
-								{/* <ProfileRow
-									icon='tag'
-									label='Payout details'
-									onClick={() => navigate('/profile/payout')}
-								/> */}
 								<ProfileRow
 									icon='bell'
 									label='Notification settings'

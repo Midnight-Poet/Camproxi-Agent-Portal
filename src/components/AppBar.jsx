@@ -6,7 +6,7 @@ export default function AppBar({ title, sub, action, onBack, flush }) {
   const {agentName, profileImg} = useApp()
 	return (
 		<header
-			className={`sticky top-0 z-50 flex justify-between items-center pt-5 pb-4 px-5 transition-colors duration-300 ${flush ? 'bg-transparent border-none' : 'glass border-b-0'}`}
+			className={`sticky top-0 z-50 flex justify-between items-center pt-5 pb-4 px-5 transition-colors duration-300 ${flush ? 'bg-transparent border-none' : 'bg-surface border-b border-line shadow-sm'}`}
 		>
 			<div className='flex items-center gap-3 w-full pr-4'>
 				{onBack && (

@@ -8,4 +8,5 @@ export const ADMIN_URL = '/api/admin'
 export const REQUESTS_URL = '/api/agent/requests'
 export const NOTIFICATIONS_URL = '/api/agent/notifications'
 export const REVIEWS_URL = '/api/agent/reviews'
+export const CHATS_URL = '/api/agent/chats'
 

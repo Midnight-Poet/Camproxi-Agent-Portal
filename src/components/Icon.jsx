@@ -54,6 +54,7 @@ export default function Icon({ name, size = 20, color = 'currentColor', stroke =
     menu: <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>,
     send: <><path d="M4 11.5 20 4l-7.5 16-2.2-6.3L4 11.5z"/></>,
     chat: <><path d="M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V16.5H5A1.5 1.5 0 0 1 3.5 15V6A1.5 1.5 0 0 1 5 4.5z"/></>,
+    moreVertical: <><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></>,
   };
 
   return (

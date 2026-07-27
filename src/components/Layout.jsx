@@ -30,11 +30,11 @@ function Sidebar({ pendingCount, unreadCount, chatCount }) {
 	};
 
 	return (
-		<aside className='hidden md:flex flex-col w-[260px] flex-shrink-0 glass-heavy rounded-card h-full relative z-10'>
+		<aside className='hidden md:flex flex-col w-[260px] flex-shrink-0 bg-surface rounded-card shadow-sm2 border border-line h-full relative z-10'>
 			{/* Logo */}
 			<div className='px-6 py-5 border-b border-line'>
 				<div className='flex items-center gap-2.5'>
-					<div className='w-9 h-9 rounded-[11px] bg-primary flex items-center justify-center shadow-md2'>
+					<div className='w-9 h-9 rounded-[11px] bg-primary flex items-center justify-center shadow-sm'>
 						<Icon name='pin' size={18} color='#fff' stroke={2.1} />
 					</div>
 					<span className='text-[20px] font-extrabold text-ink tracking-[-0.03em]'>
@@ -61,17 +61,17 @@ function Sidebar({ pendingCount, unreadCount, chatCount }) {
 							onClick={() => navigate(t.path)}
 							className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-300 text-left relative group mb-1 ${
 								active
-									? 'bg-primary/10 border border-primary/15'
-									: 'hover:bg-black/[0.04] border border-transparent'
+									? 'bg-primary/5 shadow-sm border border-primary/10'
+									: 'hover:bg-bg border border-transparent'
 							}`}
 						>
 							{active && (
-								<div className="absolute left-0 top-1/2 -translate-y-1/2 w-[4px] h-[60%] bg-gradient-to-b from-primary to-primary-600 rounded-r-full shadow-[2px_0_8px_rgba(13,122,114,0.4)]" />
+								<div className="absolute left-0 top-1/2 -translate-y-1/2 w-[4px] h-[60%] bg-primary rounded-r-full" />
 							)}
 							<div className={`relative flex-shrink-0 w-[34px] h-[34px] flex items-center justify-center rounded-lg transition-all duration-300 ${
 								active 
-									? 'bg-gradient-to-br from-primary to-primary-600 text-white shadow-[0_4px_12px_rgba(13,122,114,0.3)]' 
-									: 'bg-transparent text-muted group-hover:bg-white group-hover:shadow-sm group-hover:text-primary group-hover:border group-hover:border-white/80'
+									? 'bg-primary text-white shadow-sm' 
+									: 'bg-transparent text-muted group-hover:bg-surface group-hover:shadow-sm group-hover:text-primary group-hover:border group-hover:border-line'
 							}`}>
 								<Icon
 									name={t.icon}
@@ -88,8 +88,8 @@ function Sidebar({ pendingCount, unreadCount, chatCount }) {
 							{badge > 0 && (
 								<div className={`ml-auto min-w-[22px] h-[22px] px-1.5 flex items-center justify-center rounded-full text-[11px] font-black tracking-tight border transition-all duration-300 ${
 									active 
-										? 'bg-white border-primary/20 text-primary shadow-sm' 
-										: 'bg-gradient-to-br from-danger to-[#c23b34] border-transparent text-white shadow-[0_2px_8px_rgba(210,69,61,0.35)]'
+										? 'bg-surface border-line text-primary shadow-sm' 
+										: 'bg-danger text-white shadow-sm border-danger'
 								}`}>
 									{badge > 99 ? '99+' : badge}
 								</div>
@@ -102,9 +102,8 @@ function Sidebar({ pendingCount, unreadCount, chatCount }) {
 			{/* Add Listing CTA */}
 			<div className='px-3 pb-3'>
 				<button
-					onClick={() => navigate('/listings/create')}
-					className='w-full flex items-center justify-center gap-2 py-3 px-4 bg-primary text-white font-bold text-sm rounded-md2 cursor-pointer hover:bg-primary-600 transition-all duration-300'
-					style={{ boxShadow: '0 4px 14px rgba(13,122,114,0.35)' }}
+					onClick={() => navigate('/listings')}
+					className='w-full flex items-center justify-center gap-2 py-3 px-4 bg-primary text-white font-bold text-sm rounded-md2 cursor-pointer hover:bg-primary-600 transition-all duration-300 shadow-sm'
 				>
 					<Icon name='plus' size={17} color='#fff' stroke={2.2} /> Add
 					Listing
@@ -135,7 +134,7 @@ function BottomTabBar({ pendingCount, unreadCount, chatCount }) {
 	const { pathname } = useLocation();
 
 	return (
-		<nav className='md:hidden flex-shrink-0 flex items-stretch glass-heavy border-t-0 shadow-[0_-4px_24px_rgba(20,32,30,0.06)] h-[72px] pb-[env(safe-area-inset-bottom)]'>
+		<nav className='md:hidden flex-shrink-0 flex items-stretch bg-surface shadow-[0_-4px_24px_rgba(20,32,30,0.06)] border-t border-line h-[72px] pb-[env(safe-area-inset-bottom)]'>
 			{TABS.map((t) => {
 				const badge =
 					t.id === 'requests'
@@ -155,8 +154,8 @@ function BottomTabBar({ pendingCount, unreadCount, chatCount }) {
 					>
 						<div className={`relative w-[32px] h-[32px] flex items-center justify-center rounded-[10px] transition-all duration-300 ${
 							active 
-								? 'bg-gradient-to-br from-primary to-primary-600 text-white shadow-[0_4px_12px_rgba(13,122,114,0.3)] scale-[1.05]' 
-								: 'bg-transparent text-muted group-hover:bg-black/[0.06]'
+								? 'bg-primary text-white shadow-sm scale-[1.05]' 
+								: 'bg-transparent text-muted group-hover:bg-bg'
 						}`}>
 							<Icon
 								name={t.icon}
@@ -165,10 +164,10 @@ function BottomTabBar({ pendingCount, unreadCount, chatCount }) {
 								color="currentColor"
 							/>
 							{badge > 0 && (
-								<div className={`absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[9px] font-black tracking-tight border-[1.5px] border-white transition-all duration-300 ${
+								<div className={`absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[9px] font-black tracking-tight border-[1.5px] border-surface transition-all duration-300 ${
 									active 
-										? 'bg-white text-primary border-primary/10 shadow-sm' 
-										: 'bg-gradient-to-br from-danger to-[#c23b34] text-white shadow-sm'
+										? 'bg-surface text-primary border-line shadow-sm' 
+										: 'bg-danger text-white shadow-sm border-danger'
 								}`}>
 									{badge > 99 ? '99+' : badge}
 								</div>
@@ -186,15 +185,15 @@ export default function Layout({ children, hideTabBar }) {
 	const { toast, pendingCount, unreadCount, chatCount, notifToast, setNotifToast } = useApp();
 
 	return (
-		<div className='flex h-full bg-transparent overflow-hidden md:p-3 md:gap-3'>
+		<div className='flex h-full bg-bg overflow-hidden md:p-4 md:gap-4'>
 			<Sidebar
 				pendingCount={pendingCount}
 				unreadCount={unreadCount}
 				chatCount={chatCount}
 			/>
 
-			<div className='flex-1 flex flex-col min-w-0 overflow-hidden glass md:rounded-card relative z-10'>
-				<main className='flex-1 overflow-hidden flex flex-col'>
+			<div className='flex-1 flex flex-col min-w-0 overflow-hidden bg-bg relative z-10'>
+				<main className='flex-1 overflow-hidden flex flex-col rounded-[24px]'>
 					{children}
 				</main>
 				{!hideTabBar && (

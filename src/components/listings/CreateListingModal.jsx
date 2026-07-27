@@ -172,6 +172,15 @@ export default function CreateListingModal({ setState, id, refetchData }) {
 	};
 
 	const handleSave = async () => {
+		if (category === 'AGENT' && photos.length !== 5) {
+			flash('Exactly 5 photos are required for properties.');
+			return;
+		}
+		if (category !== 'AGENT' && photos.length === 0) {
+			flash('Please add at least one photo.');
+			return;
+		}
+
 		if (!validateForm()) {
 			flash('Please fill in all required fields.');
 			return;
@@ -283,6 +292,10 @@ export default function CreateListingModal({ setState, id, refetchData }) {
 						: 'serviceId';
 			formData.append(idField, editing[idField] || id);
 			// formData.append('id', id);
+		} else {
+			// Append schoolId when creating new items
+			const agentSchoolId = userInfo?.schoolId || userInfo?.school?._id || userInfo?.school?.id;
+			// if (agentSchoolId) formData.append('schoolId', agentSchoolId);
 		}
 
 		if (removedPhotos.length > 0) {
@@ -308,10 +321,6 @@ export default function CreateListingModal({ setState, id, refetchData }) {
 		);
 
 		try {
-			for (const [key, value] of formData.entries()) {
-				console.log(key, value);
-			}
-			// console.log(formData instanceof FormData)
 			if (id) {
 				if (category === 'VENDOR')
 					await updateProduct({ id, data: formData }).unwrap();
@@ -720,10 +729,9 @@ export default function CreateListingModal({ setState, id, refetchData }) {
 						</div>
 					)}
 
-					{/* Photos */}
 					<SectionLabel icon='camera'>Photos</SectionLabel>
 					<p className='text-[12.5px] text-muted mb-3 -mt-1.5'>
-						First photo is your cover. You can add up to 8 images.
+						First photo is your cover. {category === 'AGENT' ? 'Exactly 5 photos required.' : 'Add at least 1 photo.'}
 					</p>
 					<PhotoGallery
 						photos={photos}

@@ -102,14 +102,14 @@ export default function MyListings() {
 				/>
 
 				{/* Filter chips */}
-				<div className='flex-none flex gap-2 px-4 sm:px-6 py-4 glass border-b border-white/40 overflow-x-auto scrollbar-hide relative z-10'>
+				<div className='flex-none flex gap-2 px-4 sm:px-6 py-4 bg-surface border-b border-line shadow-sm2 overflow-x-auto scrollbar-hide relative z-10'>
 					{FILTERS.map((f) => (
 						<button
 							key={f.id}
 							className={`flex-shrink-0 text-[13.5px] font-semibold px-4 py-2.5 rounded-full border-[1.5px] transition-all duration-300 cursor-pointer ${
 								filter === f.id
 									? 'bg-gradient-to-r from-primary to-primary-600 text-white border-transparent shadow-glow'
-									: 'bg-white/60 backdrop-blur-sm text-ink border-black/10 shadow-sm hover:bg-white/80'
+									: 'bg-bg text-ink border-line shadow-sm hover:bg-line'
 							}`}
 							onClick={() => setFilter(f.id)}
 						>

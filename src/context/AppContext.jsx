@@ -1,15 +1,20 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
-import { SEED_LISTINGS, SEED_REQUESTS, SEED_NOTIFS, SEED_CHATS } from '../data';
-import { useSelector } from 'react-redux';
+import { SEED_LISTINGS, SEED_REQUESTS, SEED_NOTIFS } from '../data';
+import { useSelector, useDispatch } from 'react-redux';
 import { useGetAllProductQuery } from '../redux/api/productApiSlice';
 import { useGetAllPropertyQuery } from '../redux/api/propertyApiSlice';
 import { useGetAllServiceQuery } from '../redux/api/serviceApiSlice';
 import { useGetAgentRequestsQuery, useRespondToRequestMutation } from '../redux/api/requestsApiSlice';
 import { useGetNotificationsQuery, useMarkNotificationReadMutation, useMarkAllNotificationsReadMutation } from '../redux/api/notificationsApiSlice';
+import { useGetChatsQuery } from '../redux/api/chatApiSlice';
+import { apiSlice } from '../redux/api/apiSlice';
+import { BASE_URL } from '../redux/feautures/constants';
+import io from 'socket.io-client';
 
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
+	const dispatch = useDispatch();
 	const { userInfo } = useSelector((state) => state.auth);
 	const category = userInfo?.category;
 	const { data, refetch } = useGetAllProductQuery();
@@ -36,10 +41,12 @@ export function AppProvider({ children }) {
 			type: r.itemCategory === 'PROPERTY' ? 'lodge' : r.itemCategory === 'SERVICE' ? 'service' : 'bag', // bag for product
 			listing: item.title || item.name || 'a listing',
 			note: r.message,
+			studentId: r.studentId || r.student?.id || r.student?._id,
 		};
 	});
 	const notifs = notificationsData ?? [];
-	const [chats, setChats] = useState(SEED_CHATS);
+	const { data: chatsData } = useGetChatsQuery(undefined, { skip: !userInfo, pollingInterval: 1000 });
+	const chats = chatsData ?? [];
 	const [passwordValid, isPasswordValid] = useState();
 	const [toast, setToast] = useState('');
 	const agentType = userInfo?.category || '';
@@ -178,32 +185,68 @@ export function AppProvider({ children }) {
 		}
 	};
 
+	// Socket.IO state
+	const [socket, setSocket] = useState(null);
+
+	useEffect(() => {
+		if (userInfo) {
+			const newSocket = io(BASE_URL ? `${BASE_URL}/chat` : '/chat', {
+				withCredentials: true,
+			});
+			setSocket(newSocket);
+
+			newSocket.on('newMessage', (msg) => {
+				// We can handle new message events to show a toast,
+				// RTK Query polling or cache invalidation should handle the rest.
+				if (msg?.chatId) {
+					dispatch(apiSlice.util.invalidateTags([
+						'Chats', 
+						{ type: 'ChatMessages', id: msg.chatId }
+					]));
+				} else {
+					dispatch(apiSlice.util.invalidateTags(['Chats']));
+				}
+			});
+
+			newSocket.on('messagesRead', (payload) => {
+				if (payload?.chatId) {
+					dispatch(apiSlice.util.invalidateTags([
+						'Chats',
+						{ type: 'ChatMessages', id: payload.chatId }
+					]));
+				}
+			});
+
+			return () => newSocket.close();
+		}
+	}, [userInfo, dispatch]);
+
 	const openChatThread = (id) => {
-		setChats((cs) =>
-			cs.map((c) => (c.id === id ? { ...c, unread: 0 } : c)),
-		);
+		if (socket) {
+			socket.emit('joinChat', { chatId: id });
+			socket.emit('markAsRead', { chatId: id });
+		}
 	};
 
 	const sendChat = (id, text) => {
-		setChats((cs) =>
-			cs.map((c) =>
-				c.id === id
-					? {
-							...c,
-							messages: [
-								...c.messages,
-								{ from: 'me', text, when: 'Now' },
-							],
-							when: 'Now',
-						}
-					: c,
-			),
-		);
+		console.log(userInfo)
+		if (socket && userInfo) {
+			socket.emit('sendMessage', {
+				chatId: id,
+				senderId: userInfo.id || userInfo._id,
+				senderType: 'AGENT',
+				content: text,
+			});
+		}
 	};
 
 	const pendingCount = requests.filter((r) => r.status === 'pending').length;
 	const unreadCount = notifs.filter((n) => n.read !== true && n.isRead !== true).length;
-	const chatCount = chats.reduce((s, c) => s + c.unread, 0);
+	// Calculate total unread chats if the API provides an unread field on the chat object.
+	const chatCount = chats.reduce((s, c) => {
+		const unread = (c.messages || []).filter(m => m.senderType === 'STUDENT' && !m.isRead).length;
+		return s + unread;
+	}, 0);
 
 	return (
 		<AppContext.Provider

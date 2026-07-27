@@ -3,15 +3,15 @@ import Avatar from '../Avatar';
 
 const TYPE_ICON = { lodge: 'home', food: 'fork', groceries: 'bag', service: 'wrench' };
 
-export default function RequestCard({ r, onAct }) {
+export default function RequestCard({ r, onAct, hideAvatar }) {
   const isPending = r.status === 'pending';
   return (
     <div className="glass-heavy rounded-[24px] border border-white/60 shadow-sm p-4 sm:p-5 mb-4 animate-fadeUp hover:shadow-md transition-shadow">
       <div className="flex gap-3 sm:gap-4">
-        <Avatar name={r.name} url={r.avatarUrl} size={46} />
+        {!hideAvatar && <Avatar name={r.name} url={r.avatarUrl} size={46} />}
         <div className="flex-1 min-w-0">
           <div className="flex justify-between gap-2.5 items-baseline">
-            <div className="font-extrabold text-[15.5px] text-ink flex-1 min-w-0 truncate">{r.name}</div>
+            <div className="font-extrabold text-[15.5px] text-ink flex-1 min-w-0 truncate">{!hideAvatar ? r.name : 'Request'}</div>
             <span className="text-faint text-[12px] font-semibold whitespace-nowrap flex-shrink-0">{r.when}</span>
           </div>
           <div className="flex items-center gap-1.5 mt-1">

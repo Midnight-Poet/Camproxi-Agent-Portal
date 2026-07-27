@@ -58,6 +58,13 @@ export const agentApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: ['Agent']
 		}),
+		getStudentProfile: builder.query({
+			query: (id) => ({
+				url: `${AGENTS_URL}/student/${id}`,
+				method: 'GET',
+			}),
+			providesTags: (result, error, id) => [{ type: 'Student', id }]
+		}),
 	}),
 });
 
@@ -69,5 +76,6 @@ export const {
 	useGetAgentQuery,
 	useGetMeQuery,
     useChangePasswordMutation,
-	useDeleteAgentMutation
+	useDeleteAgentMutation,
+	useGetStudentProfileQuery
 } = agentApiSlice;

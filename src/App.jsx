@@ -11,12 +11,12 @@ import Profile from './pages/privateRoutes/Profile';
 import EditProfile from './pages/privateRoutes/settings/EditProfile';
 import Verification from './pages/privateRoutes/settings/Verification';
 import NotifSettings from './pages/privateRoutes/settings/NotifSettings';
-import PayoutDetails from './pages/privateRoutes/settings/PayoutDetails';
 import HelpCenter from './pages/privateRoutes/settings/HelpCenter';
 import SendFeedback from './pages/privateRoutes/settings/SendFeedback';
 import Reviews from './pages/privateRoutes/settings/Reviews';
 import ListingDetails from './pages/privateRoutes/ListingDetails';
 import Messages from './pages/privateRoutes/Messages';
+import StudentProfile from './pages/privateRoutes/StudentProfile';
 import { PublicRoute } from './pages/publicRoutes';
 import { PrivateRoute } from './pages/privateRoutes';
 import AuthWrapper from './components/auth/AuthWrapper';
@@ -42,6 +42,7 @@ export default function App() {
 							<Route path='/requests' element={<Requests />} />
 							<Route path='/messages' element={<Messages />} />
 							<Route path='/messages/:id' element={<Messages />} />
+							<Route path='/student/:id' element={<StudentProfile />} />
 							<Route
 								path='/notifications'
 								element={<Notifications />}
@@ -56,10 +57,6 @@ export default function App() {
 								path='/profile/notifications'
 								element={<NotifSettings />}
 							/>
-							{/* <Route
-								path='/profile/payout'
-								element={<PayoutDetails />}
-							/> */}
 							<Route path='/profile/help' element={<HelpCenter />} />
 							<Route
 								path='/profile/feedback'

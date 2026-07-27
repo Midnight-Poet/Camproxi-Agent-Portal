@@ -9,8 +9,6 @@ body {
   margin: 0;
   /* Very subtle, cool-toned bright background */
   background-color: #f8faf9;
-  background-image: radial-gradient(at 0% 0%, hsla(175, 40%, 96%, 1) 0px, transparent 50%),
-                    radial-gradient(at 100% 0%, hsla(160, 40%, 98%, 1) 0px, transparent 50%);
   background-attachment: fixed;
   font-family: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -23,13 +21,13 @@ body {
   flex-direction: column;
 }
 
-/* Glassmorphism Utility */
+/* Clean SaaS Utilities */
 @layer utilities {
   .glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-sm2;
+    @apply bg-white border border-line shadow-sm2;
   }
   .glass-heavy {
-    @apply bg-white/85 backdrop-blur-lg border border-white/60 shadow-md2;
+    @apply bg-white border border-line shadow-md2 rounded-card;
   }
 }
 

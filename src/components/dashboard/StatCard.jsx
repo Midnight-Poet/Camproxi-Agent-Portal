@@ -6,10 +6,10 @@ export default function StatCard({ stat, big, onClick }) {
 	return (
 		<button
 			onClick={onClick}
-			className={`text-left cursor-pointer flex flex-col w-full rounded-[20px] border transition-all duration-300 group overflow-hidden relative ${
+			className={`text-center cursor-pointer flex flex-col w-full rounded-[20px] border transition-all duration-300 group overflow-hidden relative ${
 				solid
 					? 'bg-gradient-to-br from-primary to-primary-600 border-transparent text-white hover:shadow-glow hover:-translate-y-1'
-					: 'bg-white/60 backdrop-blur-sm border-black/10 text-ink shadow-sm hover:shadow-md hover:bg-white/80 hover:-translate-y-1'
+					: 'bg-surface border-line text-ink shadow-sm2 hover:shadow-md hover:bg-bg hover:-translate-y-1'
 			} ${big ? 'p-5 gap-3.5' : 'p-4 gap-2'}`}
 		>
 			
@@ -45,11 +45,9 @@ export default function StatCard({ stat, big, onClick }) {
 				>
 					{stat.value}
 				</div>
-				<div className='flex items-center gap-1.5 mt-1.5'>
+				<div className='flex items-center justify-center w-full text-center gap-1.5 mt-1.5'>
 					<span
-						className={`text-[13px] font-bold ${
-							solid ? 'text-white/80' : 'text-muted group-hover:text-camtext transition-colors'
-						}`}
+						className={`text-[13px] text-center font-bold text-muted group-hover:text-camtext transition-colors`}
 					>
 						{stat.label}
 					</span>

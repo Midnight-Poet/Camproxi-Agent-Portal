@@ -11,7 +11,7 @@ import NotifToggle from '../../../components/settings/NotifToggle';
 export default function NotifSettings() {
   const navigate = useNavigate();
   const { flash } = useApp();
-  const [s, setS] = useState({ req: true, msg: true, approve: true, views: false, payout: true, tips: false, pushAll: true, emailAll: true });
+  const [s, setS] = useState({ req: true, msg: true, approve: true, views: false, tips: false, pushAll: true, emailAll: true });
   const set = k => v => { setS(p => ({ ...p, [k]: v })); flash('Preference saved'); };
 
   return (
@@ -36,7 +36,6 @@ export default function NotifSettings() {
 
             <div className="text-[11px] font-extrabold tracking-[0.09em] uppercase text-primary mb-2.5">More</div>
             <div className="bg-white rounded-card border border-line2 shadow-sm2 overflow-hidden">
-              <NotifToggle icon="card" label="Payout updates" sub="Transfers & balance changes"     on={s.payout} onChange={set('payout')} />
               <NotifToggle icon="bolt" label="Tips & product news" sub="Occasional, never spammy" on={s.tips}   onChange={set('tips')} last />
             </div>
           </div>

@@ -4,6 +4,7 @@ import Icon from '../../components/Icon';
 import { useLoginMutation } from '../../redux/api/agentApiSlice';
 import { useDispatch } from 'react-redux';
 import { setCredientials } from '../../redux/feautures/auth/authSlice';
+import { apiSlice } from '../../redux/api/apiSlice';
 import { useApp } from '../../context/AppContext';
 import Toast from '../../components/Toast';
 import Loading from '../../components/Loading';
@@ -32,6 +33,7 @@ export default function SignIn() {
 			const res = await userLogin({email, password}).unwrap()
 			flash('Successfully Logged in!')
 			dispatch(setCredientials({...res}))
+			dispatch(apiSlice.util.resetApiState())
 			navigate('/dashboard');
 		} catch (err) {
 			loginValidation(await err?.data?.message || await err.message)

@@ -18,7 +18,7 @@ export default function RichCard({ l, onEdit, onDelete }) {
 		images.push(l.images);
 	}
 	return (
-		<div className='glass-heavy rounded-[24px] border border-white/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden mb-3.5 animate-fadeUp flex flex-col'>
+		<div className='bg-surface rounded-card border border-line shadow-sm2 hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden mb-3.5 animate-fadeUp flex flex-col'>
 			<div className='relative h-60 cursor-pointer' onClick={() => navigate(`/listings/${l.id || l._id}`)}>
 				<ImagePlaceholder images={images} label={l.i} />
 				<div className='absolute top-3 left-3'>

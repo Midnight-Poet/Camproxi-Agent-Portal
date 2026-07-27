@@ -7,7 +7,6 @@ import { useApp } from '../../../context/AppContext';
 
 const HELP_FAQS = [
   { q: 'How do I get my listing approved?', a: "Submit your listing with clear photos and accurate details. Our team reviews within 24 hours and you'll get a notification once it's live." },
-  { q: 'When do I receive payouts?', a: 'Payouts follow your chosen schedule in Payout details. Funds clear to your linked bank account 1–2 business days after a reservation is confirmed.' },
   { q: 'How does verification work?', a: 'We confirm your identity, business and contact details using the documents you upload. A verified badge builds trust with students.' },
   { q: 'Can I pause a listing temporarily?', a: 'Yes — toggle availability off on any listing to mark it as taken. It stays in your account and can be reactivated anytime.' },
   { q: "A student isn't responding — what do I do?", a: 'Requests auto-expire after 48 hours. You can decline a stale request to free up the slot, or message the student directly.' },

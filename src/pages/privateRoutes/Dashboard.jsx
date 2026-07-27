@@ -9,6 +9,7 @@ import CreateListing2 from './createListingv2';
 import Spark from '../../components/dashboard/Spark';
 import StatCard from '../../components/dashboard/StatCard';
 import QuickAction from '../../components/dashboard/QuickAction';
+import CreateListingModal from '../../components/listings/CreateListingModal';
 
 export default function Dashboard() {
 	const navigate = useNavigate();
@@ -25,14 +26,14 @@ export default function Dashboard() {
 			value: listings?.length || 0,
 			label: 'Total listings',
 			icon: 'listings',
-			trend: '+2 this month',
+			// trend: '+2 this month',
 		},
 		{
 			key: 'res',
 			value: activeRes,
 			label: 'Active reservations',
 			icon: 'calendar',
-			trend: '+3 this week',
+			// trend: '+3 this week',
 		},
 		{
 			key: 'pending',
@@ -41,26 +42,18 @@ export default function Dashboard() {
 			icon: 'requests',
 			spark: [3, 5, 4, 6, 8, 7, pending.length + 4],
 		},
-		{
-			key: 'views',
-			value: views?.toLocaleString(),
-			label: 'Profile views',
-			icon: 'eye',
-			trend: '+18% vs last wk',
-			spark: [40, 55, 48, 70, 65, 88, 96],
-		},
 	];
 
 	return (
 		<Layout>
-			<div className='flex flex-col h-full'>
-				<header className='flex-none glass pt-5 pb-4 px-4 sm:pt-7 sm:pb-5 sm:px-6 border-b-0 shadow-sm relative z-20'>
+			<div className='flex flex-col h-full bg-bg'>
+				<header className='flex-none bg-surface pt-5 pb-4 px-4 sm:pt-7 sm:pb-5 sm:px-6 border-b border-line shadow-sm relative z-20'>
 					<div className='flex items-center gap-4'>
 						<div className='flex-1 min-w-0'>
 							<p className='m-0 text-[11.5px] sm:text-[12.5px] text-primary font-bold uppercase tracking-[0.08em] mb-0.5'>
 								Good morning
 							</p>
-							<h1 className='mt-0 text-[22px] sm:text-[26px] font-extrabold text-ink tracking-tight truncate'>
+							<h1 className='mt-0 text-[22px] capitalize sm:text-[26px] font-extrabold text-ink tracking-tight truncate'>
 								Hi, {username || 'Agent'}
 							</h1>
 						</div>
@@ -68,11 +61,11 @@ export default function Dashboard() {
 							onClick={() => navigate('/profile')}
 							className='cursor-pointer border-none bg-none p-0 hover:scale-105 transition-transform flex-shrink-0'
 						>
-							<div className="p-0.5 rounded-full bg-primary shadow-sm2">
-								<div className="border-2 border-white rounded-full overflow-hidden">
+							<div className="p-0.5 rounded-full bg-primary/10 shadow-sm border border-primary/20">
+								<div className="border-[2.5px] border-surface rounded-full overflow-hidden shadow-sm2">
 									<Avatar
 										name={agentName}
-										size={40}
+										size={42}
 										url={profileImg}
 									/>
 								</div>
@@ -86,15 +79,15 @@ export default function Dashboard() {
 					<div className='px-4 sm:px-6 pb-10 pt-5 sm:pt-6 animate-fadeUp'>
 						{/* Overview */}
 						<div className='flex items-baseline justify-between mb-4 sm:mb-5'>
-							<h2 className='m-0 text-[16px] sm:text-[18px] font-extrabold text-ink tracking-tight'>
+							<h2 className='m-0 text-[16.5px] sm:text-[18.5px] font-extrabold text-ink tracking-tight'>
 								Overview
 							</h2>
-							<span className='text-[12px] sm:text-[12.5px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full'>
+							<span className='text-[12px] sm:text-[12.5px] font-bold text-primary bg-primary/5 border border-primary/10 px-3 py-1 rounded-full'>
 								This week
 							</span>
 						</div>
 						{/* Stats — 2 cols on mobile, 4 on lg */}
-						<div className='grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-7 sm:mb-8'>
+						<div className='grid grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 mb-8 sm:mb-10'>
 							{stats.map((s) => (
 								<StatCard
 									key={s.key}
@@ -111,7 +104,7 @@ export default function Dashboard() {
 						</div>
 
 						{/* Quick actions */}
-						<h2 className='m-0 mb-4 sm:mb-5 text-[16px] sm:text-[18px] font-extrabold text-ink tracking-tight'>
+						<h2 className='m-0 mb-4 sm:mb-5 text-[16.5px] sm:text-[18.5px] font-extrabold text-ink tracking-tight'>
 							Quick actions
 						</h2>
 						<div className='grid grid-cols-2 sm:flex sm:flex-row gap-3 sm:gap-5 mb-8 sm:mb-10'>
@@ -132,7 +125,7 @@ export default function Dashboard() {
 
 						{/* Needs attention */}
 						<div className='flex items-baseline justify-between mb-4 sm:mb-5'>
-							<h2 className='m-0 text-[16px] sm:text-[18px] font-extrabold text-ink tracking-tight'>
+							<h2 className='m-0 text-[16.5px] sm:text-[18.5px] font-extrabold text-ink tracking-tight'>
 								Needs your attention
 							</h2>
 							<button
@@ -142,13 +135,13 @@ export default function Dashboard() {
 								See all
 							</button>
 						</div>
-						<div className='glass-heavy rounded-[24px] border border-white/60 shadow-sm overflow-hidden flex flex-col'>
+						<div className='bg-surface rounded-card border border-line shadow-sm2 overflow-hidden flex flex-col'>
 							{pending.slice(0, 3).map((r, i) => (
 								<div key={r.id} className="relative group">
 									{i > 0 && <div className='h-px bg-line/60 mx-4' />}
 									<button
 										onClick={() => navigate('/requests')}
-										className='flex items-center gap-3.5 p-4 w-full text-left cursor-pointer border-none bg-transparent hover:bg-black/5 transition-colors relative z-10'
+										className='flex items-center gap-3.5 p-4 w-full text-left cursor-pointer border-none bg-transparent hover:bg-bg transition-colors relative z-10'
 									>
 										<Avatar
 											name={r.name}
@@ -161,12 +154,12 @@ export default function Dashboard() {
 											</div>
 											<div className='text-muted text-[13px] truncate mt-0.5'>
 												wants{' '}
-												<strong className='text-camtext font-extrabold'>
+												<strong className='text-ink font-extrabold'>
 													{r.listing}
 												</strong>
 											</div>
 										</div>
-										<span className='flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full bg-warn-bg text-warn uppercase tracking-wider'>
+										<span className='flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full bg-warn/10 text-warn uppercase tracking-wider border border-warn/20'>
 											<span className='w-1.5 h-1.5 rounded-full bg-current animate-pulseSoft' />{' '}
 											New
 										</span>
@@ -175,7 +168,7 @@ export default function Dashboard() {
 							))}
 							{pending.length === 0 && (
 								<div className='py-8 flex flex-col items-center justify-center text-center'>
-									<div className="w-12 h-12 bg-ok-bg text-ok rounded-full flex items-center justify-center mb-3">
+									<div className="w-12 h-12 bg-ok/10 text-ok border border-ok/20 rounded-full flex items-center justify-center mb-3">
 										<Icon name="check" size={24} stroke={2.5} />
 									</div>
 									<div className="font-extrabold text-ink text-[15px]">You're all caught up!</div>
@@ -187,8 +180,8 @@ export default function Dashboard() {
 				</div>
 			</div>
 			{newListing && (
-				<div className='transition-opacity duration-500 animate-fadeUp fixed top-0 left-0 z-999 h-screen w-full bg-black/20 flex items-center justify-center'>
-					<CreateListing2 setState={() => setNewListing(false)} />
+				<div className='transition-opacity duration-500 animate-fadeUp fixed top-0 left-0 z-[999] h-screen w-full bg-ink/40 backdrop-blur-sm flex items-center justify-center'>
+					<CreateListingModal setState={() => setNewListing(false)} />
 				</div>
 			)}
 		</Layout>
