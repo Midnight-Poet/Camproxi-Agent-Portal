@@ -108,7 +108,7 @@ export default function MessagesPage() {
     setDraft('');
     setTimeout(() => {
       refetchMessages();
-    }, 200);
+    }, 100);
   };
 
   const filteredChats = chats.filter(c =>

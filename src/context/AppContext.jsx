@@ -4,8 +4,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useGetAllProductQuery } from '../redux/api/productApiSlice';
 import { useGetAllPropertyQuery } from '../redux/api/propertyApiSlice';
 import { useGetAllServiceQuery } from '../redux/api/serviceApiSlice';
-import { useGetAgentRequestsQuery, useRespondToRequestMutation } from '../redux/api/requestsApiSlice';
-import { useGetNotificationsQuery, useMarkNotificationReadMutation, useMarkAllNotificationsReadMutation } from '../redux/api/notificationsApiSlice';
+import {
+	useGetAgentRequestsQuery,
+	useRespondToRequestMutation,
+} from '../redux/api/requestsApiSlice';
+import {
+	useGetNotificationsQuery,
+	useMarkNotificationReadMutation,
+	useMarkAllNotificationsReadMutation,
+} from '../redux/api/notificationsApiSlice';
 import { useGetChatsQuery } from '../redux/api/chatApiSlice';
 import { apiSlice } from '../redux/api/apiSlice';
 import { BASE_URL } from '../redux/feautures/constants';
@@ -22,8 +29,15 @@ export function AppProvider({ children }) {
 		useGetAllPropertyQuery();
 	const { data: serviceData, refetch: refetchService } =
 		useGetAllServiceQuery();
-	const { data: requestsData } = useGetAgentRequestsQuery(undefined, { skip: !userInfo, pollingInterval: 1000 });
-	const { data: notificationsData, isLoading: isLoadingNotifs } = useGetNotificationsQuery(undefined, { skip: !userInfo, pollingInterval: 1000 });
+	const { data: requestsData } = useGetAgentRequestsQuery(undefined, {
+		skip: !userInfo,
+		pollingInterval: 1000,
+	});
+	const { data: notificationsData, isLoading: isLoadingNotifs } =
+		useGetNotificationsQuery(undefined, {
+			skip: !userInfo,
+			pollingInterval: 1000,
+		});
 
 	const [respondToRequest] = useRespondToRequestMutation();
 	const [markNotificationRead] = useMarkNotificationReadMutation();
@@ -31,21 +45,43 @@ export function AppProvider({ children }) {
 
 	const [listings, setListings] = useState([]);
 	const requests = (requestsData ?? []).map((r) => {
-		const item = listings.find((l) => String(l.id || l._id) === String(r.itemId)) || {};
+		const item =
+			listings.find((l) => String(l.id || l._id) === String(r.itemId)) ||
+			{};
 		return {
 			id: r.id || r._id,
-			status: r.status === 'PENDING' ? 'pending' : r.status === 'APPROVED' ? 'accepted' : 'declined',
-			name: `${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim() || 'Student',
+			status:
+				r.status === 'PENDING'
+					? 'pending'
+					: r.status === 'APPROVED'
+						? 'accepted'
+						: 'declined',
+			name:
+				`${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim() ||
+				'Student',
 			avatarUrl: r.student?.profileImage?.url,
-			when: r.createdAt ? new Date(r.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '',
-			type: r.itemCategory === 'PROPERTY' ? 'lodge' : r.itemCategory === 'SERVICE' ? 'service' : 'bag', // bag for product
+			when: r.createdAt
+				? new Date(r.createdAt).toLocaleDateString(undefined, {
+						month: 'short',
+						day: 'numeric',
+					})
+				: '',
+			type:
+				r.itemCategory === 'PROPERTY'
+					? 'lodge'
+					: r.itemCategory === 'SERVICE'
+						? 'service'
+						: 'bag', // bag for product
 			listing: item.title || item.name || 'a listing',
 			note: r.message,
 			studentId: r.studentId || r.student?.id || r.student?._id,
 		};
 	});
 	const notifs = notificationsData ?? [];
-	const { data: chatsData } = useGetChatsQuery(undefined, { skip: !userInfo, pollingInterval: 1000 });
+	const { data: chatsData } = useGetChatsQuery(undefined, {
+		skip: !userInfo,
+		pollingInterval: 1000,
+	});
 	const chats = chatsData ?? [];
 	const [passwordValid, isPasswordValid] = useState();
 	const [toast, setToast] = useState('');
@@ -59,15 +95,19 @@ export function AppProvider({ children }) {
 
 	useEffect(() => {
 		if (notificationsData && prevNotifsRef.current.length > 0) {
-			const prevIds = new Set(prevNotifsRef.current.map(n => n.id || n._id));
-			const newNotifs = notificationsData.filter(n => !(prevIds.has(n.id || n._id)));
-			
+			const prevIds = new Set(
+				prevNotifsRef.current.map((n) => n.id || n._id),
+			);
+			const newNotifs = notificationsData.filter(
+				(n) => !prevIds.has(n.id || n._id),
+			);
+
 			if (newNotifs.length > 0) {
 				const latest = newNotifs[0];
 				setNotifToast({
 					title: 'New Notification',
 					msg: latest.message || 'You have a new notification',
-					icon: 'bell'
+					icon: 'bell',
 				});
 			}
 		}
@@ -80,15 +120,19 @@ export function AppProvider({ children }) {
 
 	useEffect(() => {
 		if (requestsData && prevRequestsRef.current.length > 0) {
-			const prevIds = new Set(prevRequestsRef.current.map(n => n.id || n._id));
-			const newReqs = requestsData.filter(n => !(prevIds.has(n.id || n._id)));
-			
+			const prevIds = new Set(
+				prevRequestsRef.current.map((n) => n.id || n._id),
+			);
+			const newReqs = requestsData.filter(
+				(n) => !prevIds.has(n.id || n._id),
+			);
+
 			if (newReqs.length > 0) {
 				const latest = newReqs[0];
 				setNotifToast({
 					title: 'New Request',
 					msg: latest.message || 'You received a new request',
-					icon: 'requests'
+					icon: 'requests',
 				});
 			}
 		}
@@ -103,7 +147,6 @@ export function AppProvider({ children }) {
 		else if (category === 'AGENT') setListings(propertyData ?? []);
 		else setListings(serviceData ?? []);
 	}, [category, data, propertyData, serviceData]);
-
 
 	const flash = (msg) => {
 		setToast(msg);
@@ -140,9 +183,13 @@ export function AppProvider({ children }) {
 		try {
 			await respondToRequest({
 				id,
-				data: { status: status === 'accepted' ? 'APPROVED' : 'REJECTED' }
+				data: {
+					status: status === 'accepted' ? 'APPROVED' : 'REJECTED',
+				},
 			}).unwrap();
-			flash(status === 'accepted' ? 'Request accepted' : 'Request declined');
+			flash(
+				status === 'accepted' ? 'Request accepted' : 'Request declined',
+			);
 		} catch (error) {
 			flash('Failed to respond to request.');
 		}
@@ -192,6 +239,7 @@ export function AppProvider({ children }) {
 		if (userInfo) {
 			const newSocket = io(BASE_URL ? `${BASE_URL}/chat` : '/chat', {
 				withCredentials: true,
+				transports: ['websocket', 'polling'],
 			});
 			setSocket(newSocket);
 
@@ -199,10 +247,12 @@ export function AppProvider({ children }) {
 				// We can handle new message events to show a toast,
 				// RTK Query polling or cache invalidation should handle the rest.
 				if (msg?.chatId) {
-					dispatch(apiSlice.util.invalidateTags([
-						'Chats', 
-						{ type: 'ChatMessages', id: msg.chatId }
-					]));
+					dispatch(
+						apiSlice.util.invalidateTags([
+							'Chats',
+							{ type: 'ChatMessages', id: msg.chatId },
+						]),
+					);
 				} else {
 					dispatch(apiSlice.util.invalidateTags(['Chats']));
 				}
@@ -210,10 +260,12 @@ export function AppProvider({ children }) {
 
 			newSocket.on('messagesRead', (payload) => {
 				if (payload?.chatId) {
-					dispatch(apiSlice.util.invalidateTags([
-						'Chats',
-						{ type: 'ChatMessages', id: payload.chatId }
-					]));
+					dispatch(
+						apiSlice.util.invalidateTags([
+							'Chats',
+							{ type: 'ChatMessages', id: payload.chatId },
+						]),
+					);
 				}
 			});
 
@@ -229,7 +281,6 @@ export function AppProvider({ children }) {
 	};
 
 	const sendChat = (id, text) => {
-		console.log(userInfo)
 		if (socket && userInfo) {
 			socket.emit('sendMessage', {
 				chatId: id,
@@ -241,10 +292,14 @@ export function AppProvider({ children }) {
 	};
 
 	const pendingCount = requests.filter((r) => r.status === 'pending').length;
-	const unreadCount = notifs.filter((n) => n.read !== true && n.isRead !== true).length;
+	const unreadCount = notifs.filter(
+		(n) => n.read !== true && n.isRead !== true,
+	).length;
 	// Calculate total unread chats if the API provides an unread field on the chat object.
 	const chatCount = chats.reduce((s, c) => {
-		const unread = (c.messages || []).filter(m => m.senderType === 'STUDENT' && !m.isRead).length;
+		const unread = (c.messages || []).filter(
+			(m) => m.senderType === 'STUDENT' && !m.isRead,
+		).length;
 		return s + unread;
 	}, 0);
 
