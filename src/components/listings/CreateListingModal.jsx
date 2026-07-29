@@ -500,17 +500,8 @@ export default function CreateListingModal({ setState, id, refetchData }) {
 								</button>
 								<MapContainer
 									location={{ lat: form.lat, lng: form.lng }}
-								>
-									{(map) => (
-										<MapMarkersController
-											map={map}
-											location={{
-												lat: form.lat,
-												lng: form.lng,
-											}}
-										/>
-									)}
-								</MapContainer>
+									onLocationChange={(newLoc) => setForm(prev => ({ ...prev, lat: newLoc.lat, lng: newLoc.lng }))}
+								/>
 							</div>
 						</div>
 					)}

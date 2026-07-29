@@ -11,11 +11,14 @@
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.1.1",
+    "@midnight_poet/freemaps": "^0.1.0",
     "@reduxjs/toolkit": "^2.12.0",
     "browser-image-compression": "^2.0.2",
+    "leaflet": "^1.9.4",
     "lucide-react": "^1.17.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-leaflet": "^5.0.0",
     "react-redux": "^9.3.0",
     "react-router-dom": "^7.16.0",
     "socket.io-client": "^4.8.3"

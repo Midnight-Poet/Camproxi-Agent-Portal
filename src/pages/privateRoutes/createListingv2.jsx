@@ -603,15 +603,8 @@ export default function CreateListing2({ setState, id }) {
 									</button>
 									<MapContainer
 										location={currentLocation}
-										// onAddressFetch={setStreetAddress}
-									>
-										{(mapInstance) => (
-											<MapMarkersController
-												map={mapInstance}
-												location={currentLocation}
-											/>
-										)}
-									</MapContainer>
+										onLocationChange={(newLoc) => setCurrentLocation(newLoc)}
+									/>
 								</div>
 							)}
 
