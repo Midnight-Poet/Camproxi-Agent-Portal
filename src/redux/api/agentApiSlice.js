@@ -65,6 +65,34 @@ export const agentApiSlice = apiSlice.injectEndpoints({
 			}),
 			providesTags: (result, error, id) => [{ type: 'Student', id }]
 		}),
+		sendEmailVerification: builder.mutation({
+			query: () => ({
+				url: `${AGENTS_URL}/send-verification`,
+				method: 'POST',
+			}),
+		}),
+		verifyEmail: builder.mutation({
+			query: (data) => ({
+				url: `${AGENTS_URL}/verify-email`,
+				method: 'POST',
+				body: data,
+			}),
+			invalidatesTags: ['Agent'],
+		}),
+		sendPhoneVerification: builder.mutation({
+			query: () => ({
+				url: `${AGENTS_URL}/send-phone-verification`,
+				method: 'POST',
+			}),
+		}),
+		verifyPhone: builder.mutation({
+			query: (data) => ({
+				url: `${AGENTS_URL}/verify-phone`,
+				method: 'POST',
+				body: data,
+			}),
+			invalidatesTags: ['Agent'],
+		}),
 	}),
 });
 
@@ -77,5 +105,9 @@ export const {
 	useGetMeQuery,
     useChangePasswordMutation,
 	useDeleteAgentMutation,
-	useGetStudentProfileQuery
+	useGetStudentProfileQuery,
+	useSendEmailVerificationMutation,
+	useVerifyEmailMutation,
+	useSendPhoneVerificationMutation,
+	useVerifyPhoneMutation,
 } = agentApiSlice;

@@ -20,6 +20,13 @@
 | `PATCH`| `/api/agent/profile/update` | `AgentAuthGuard` | Update profile (supports `profileImage` upload) |
 | `DELETE`| `/api/agent/profile` | `AgentAuthGuard` | Delete agent account and clear cookie |
 | `GET` | `/api/agent/student/:id` | `AgentAuthGuard` | Fetch public profile of a student |
+| `POST` | `/api/agent/send-verification` | `AgentAuthGuard` | Sends a 6-digit OTP to the agent's email. |
+| `POST` | `/api/agent/verify-email` | `AgentAuthGuard` | Verifies email. Body: `{ "otp": "string" }` |
+| `POST` | `/api/agent/send-phone-verification` | `AgentAuthGuard` | Sends a 6-digit OTP to the agent's phone via SMS. |
+| `POST` | `/api/agent/verify-phone` | `AgentAuthGuard` | Verifies phone. Body: `{ "otp": "string" }` |
+
+> [!NOTE]  
+> The agent's `isverified` flag will only be set to `true` when BOTH `emailVerified` and `phoneVerified` are strictly true.
 
 ### Profile Response
 When an agent fetches their profile (`/api/agent/profile` or `/api/agent/me`), the populated `school` data uses the updated `code` and `campus` arrays:
