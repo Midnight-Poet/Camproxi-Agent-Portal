@@ -4,11 +4,11 @@ import Avatar from '../../components/Avatar';
 import { useApp } from '../../context/AppContext';
 import Layout from '../../components/Layout';
 import { useState } from 'react';
-import CreateListing from './CreateListing';
-import CreateListing2 from './createListingv2';
+
 import Spark from '../../components/dashboard/Spark';
 import StatCard from '../../components/dashboard/StatCard';
 import QuickAction from '../../components/dashboard/QuickAction';
+import CreateListingModal from '../../components/listings/CreateListingModal';
 
 export default function Dashboard() {
 	const navigate = useNavigate();
@@ -179,9 +179,7 @@ export default function Dashboard() {
 				</div>
 			</div>
 			{newListing && (
-				<div className='transition-opacity duration-500 animate-fadeUp fixed top-0 left-0 z-[999] h-screen w-full bg-ink/40 backdrop-blur-sm flex items-center justify-center'>
-					<CreateListing2 setState={() => setNewListing(false)} />
-				</div>
+				<CreateListingModal setState={() => setNewListing(false)} />
 			)}
 		</Layout>
 	);

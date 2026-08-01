@@ -8,7 +8,7 @@ import AppBar from '../../components/AppBar';
 import Layout from '../../components/Layout';
 import { useApp } from '../../context/AppContext';
 import { priceLine } from '../../data';
-import CreateListing2 from './createListingv2';
+import CreateListingModal from '../../components/listings/CreateListingModal';
 import { useDeleteProductMutation, useGetAllProductQuery } from '../../redux/api/productApiSlice';
 import {
 	useDeletePropertyMutation,
@@ -247,7 +247,7 @@ export default function MyListings() {
 				)}
 			</div>
 			{newListing && (
-				<CreateListing2
+				<CreateListingModal
 					setState={() => {
 						setNewListing(false);
 					}}
@@ -263,7 +263,7 @@ export default function MyListings() {
 				msg={'Deleting...'}
 			/>
 			{editListing && (
-				<CreateListing2
+				<CreateListingModal
 					id={id}
 					setState={() => {
 						setEditListing(false);

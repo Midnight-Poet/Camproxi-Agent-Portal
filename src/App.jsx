@@ -4,7 +4,7 @@ import SignIn from './pages/publicRoutes/SignIn';
 import Onboarding from './pages/publicRoutes/Onboarding';
 import Dashboard from './pages/privateRoutes/Dashboard';
 import MyListings from './pages/privateRoutes/MyListings';
-import CreateListing from './pages/privateRoutes/CreateListing';
+
 import Requests from './pages/privateRoutes/Requests';
 import Notifications from './pages/privateRoutes/Notifications';
 import Profile from './pages/privateRoutes/Profile';
