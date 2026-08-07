@@ -144,7 +144,7 @@ export default function StudentProfile() {
                       <div className="min-w-0 pr-4">
                         <div className="text-[14.5px] font-semibold text-ink mb-0.5 truncate">{c.item?.name || c.listing || 'General Chat'}</div>
                         <div className="text-[13px] text-muted font-medium truncate">
-                          {lastMsg ? ((lastMsg.senderType === 'AGENT' || lastMsg.from === 'me' ? 'You: ' : '') + (lastMsg.content || lastMsg.text)) : 'Waiting for student...'}
+                          {lastMsg ? (((lastMsg.senderType === 'AGENT' || lastMsg.senderModel === 'AGENT' || lastMsg.from === 'me') ? 'You: ' : '') + (lastMsg.content || lastMsg.text)) : 'Waiting for student...'}
                         </div>
                       </div>
                       <Icon name="chevronRight" size={16} className="text-muted group-hover:text-ink transition-colors flex-shrink-0" />

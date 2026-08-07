@@ -5,9 +5,12 @@ import Avatar from '../../components/Avatar';
 import Icon from '../../components/Icon';
 import Bubble from '../../components/messages/Bubble';
 import { useApp } from '../../context/AppContext';
-import { useGetChatMessagesQuery, useMarkChatReadMutation } from '../../redux/api/chatApiSlice';
+import { useChat } from '../../context/ChatContext';
+import { useGetChatsQuery, useGetChatMessagesQuery, useMarkChatReadMutation } from '../../redux/api/chatApiSlice';
+import { useDispatch } from 'react-redux';
+import { apiSlice } from '../../redux/api/apiSlice';
 
-const isMine = (m) => m.senderType === 'AGENT' || m.from === 'me';
+const isMine = (m) => m.senderType === 'AGENT' || m.senderModel === 'AGENT' || m.from === 'me';
 const isSystemMsg = (m) => {
   const text = m.content || m.text || '';
   return text.toLowerCase().includes('started a conversation');
@@ -45,7 +48,9 @@ const getDemarcation = (dateStr) => {
 export default function MessagesPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { chats, openChatThread, sendChat, flash } = useApp();
+  const { flash } = useApp();
+  const { joinChat, sendChatMessage, markChatAsReadSocket } = useChat();
+  const dispatch = useDispatch();
   
   const [q, setQ] = useState('');
   const [draft, setDraft] = useState('');
@@ -63,10 +68,13 @@ export default function MessagesPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const { data: chatsData } = useGetChatsQuery();
+  const chats = chatsData || [];
+
   const activeChat = id ? chats.find(c => c.id === id || c._id === id) : null;
   const activeIdString = activeChat?.id || activeChat?._id;
 
-  const { data: messagesData, refetch: refetchMessages } = useGetChatMessagesQuery(activeIdString, { skip: !activeIdString, pollingInterval: 1000 });
+  const { data: messagesData } = useGetChatMessagesQuery(activeIdString, { skip: !activeIdString });
   const [markRead] = useMarkChatReadMutation();
 
   const activeMessages = [...(messagesData || [])].sort((a, b) => {
@@ -84,13 +92,21 @@ export default function MessagesPage() {
 
   const hasStudentMessage = activeMessages.some(m => !isMine(m));
 
-  const activeChatUnread = (activeChat?.messages || []).filter(m => m.senderType === 'STUDENT' && !m.isRead).length;
+  // Compute unread based on fetched messages
+  const activeChatUnread = activeMessages.filter(m => !isMine(m) && !m.isRead).length;
+
+  useEffect(() => {
+    if (activeIdString) {
+      joinChat(activeIdString);
+    }
+  }, [activeIdString, joinChat]);
 
   useEffect(() => {
     if (activeIdString && activeChatUnread > 0) {
-      markRead(activeIdString);
+      markChatAsReadSocket(activeIdString); // emit via WS
+      markRead(activeIdString); // call REST API
     }
-  }, [activeIdString, activeChatUnread, markRead]);
+  }, [activeIdString, activeChatUnread, markChatAsReadSocket, markRead]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -98,39 +114,73 @@ export default function MessagesPage() {
   }, [activeIdString, activeMessages.length]);
 
   const openChat = (chatId) => {
-    openChatThread(chatId);
     navigate(`/messages/${chatId}`);
   };
 
   const send = () => {
     if (!draft.trim() || !activeIdString) return;
-    sendChat(activeIdString, draft.trim());
+    const text = draft.trim();
+    sendChatMessage(activeIdString, text);
     setDraft('');
-    setTimeout(() => {
-      refetchMessages();
-    }, 100);
+    
+    // Optimistic Update
+    const optId = 'opt-' + Date.now();
+    const optMsg = {
+      id: optId,
+      content: text,
+      senderType: 'AGENT',
+      createdAt: new Date().toISOString(),
+      isRead: false
+    };
+
+    dispatch(
+      apiSlice.util.updateQueryData('getChatMessages', activeIdString, (draftMessages) => {
+        const arr = Array.isArray(draftMessages) ? draftMessages : (draftMessages?.data || draftMessages?.messages || []);
+        arr.push(optMsg);
+      })
+    );
+    
+    dispatch(
+      apiSlice.util.updateQueryData('getChats', undefined, (draftChats) => {
+        const arr = Array.isArray(draftChats) ? draftChats : (draftChats?.data || draftChats?.chats || []);
+        const chat = arr.find(c => String(c.id || c._id) === activeIdString);
+        if (chat) {
+          if (!chat.messages) chat.messages = [];
+          chat.messages.push(optMsg);
+        }
+      })
+    );
   };
 
-  const filteredChats = chats.filter(c =>
-    (c.student?.firstName || c.name || '').toLowerCase().includes(q.toLowerCase()) ||
-    (c.item?.name || c.listing || '').toLowerCase().includes(q.toLowerCase())
+  // Sort chats by latest message created At
+  const sortedChats = [...chats].sort((a, b) => {
+    const lastA = (a.messages && a.messages.length > 0) ? a.messages[a.messages.length - 1] : null;
+    const lastB = (b.messages && b.messages.length > 0) ? b.messages[b.messages.length - 1] : null;
+    const timeA = lastA ? new Date(lastA.createdAt).getTime() : new Date(a.createdAt || 0).getTime();
+    const timeB = lastB ? new Date(lastB.createdAt).getTime() : new Date(b.createdAt || 0).getTime();
+    return timeB - timeA;
+  });
+
+  const filteredChats = sortedChats.filter(c =>
+    (c.student?.firstName || c.student?.lastName || c.name || '').toLowerCase().includes(q.toLowerCase()) ||
+    (c.itemCategory || c.listing || '').toLowerCase().includes(q.toLowerCase())
   );
 
   return (
     <Layout hideTabBar={!!id}>
-      <div className="flex h-full bg-bg overflow-hidden md:rounded-card relative z-10 shadow-sm2 border">
+      <div className="flex h-full bg-bg overflow-hidden md:rounded-card relative z-10 shadow-sm border border-line">
         {/* LEFT PANE: Chat List */}
-        <div className={`w-full md:w-[340px] lg:w-[360px] flex-shrink-0 flex-col bg-surface border-r border-line ${id ? 'hidden md:flex' : 'flex'}`}>
-          <div className="px-5 py-4 border-b border-line sticky top-0 z-20 bg-surface/90 backdrop-blur-xl">
+        <div className={`w-full md:w-[340px] lg:w-[380px] flex-shrink-0 flex-col bg-white border-r border-line ${id ? 'hidden md:flex' : 'flex'}`}>
+          <div className="px-5 py-4 border-b border-line sticky top-0 z-20 bg-white">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[22px] font-bold text-ink tracking-tight">Messages</h2>
+              <h2 className="text-[22px] font-bold text-ink tracking-tight">Chats</h2>
             </div>
             <div className="relative">
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted">
                 <Icon name="search" size={17} />
               </span>
               <input
-                className="w-full text-[14.5px] bg-bg border border-transparent rounded-[12px] pl-10 pr-4 py-2.5 outline-none focus:bg-surface focus:border-primary/40 focus:ring-4 focus:ring-primary/10 transition-all text-ink placeholder:text-muted font-medium shadow-sm"
+                className="w-full text-[14.5px] bg-[#f0f2f5] border border-transparent rounded-[12px] pl-10 pr-4 py-2.5 outline-none focus:bg-white focus:border-primary/40 focus:ring-4 focus:ring-primary/10 transition-all text-ink placeholder:text-muted font-medium"
                 placeholder="Search students or listings"
                 value={q}
                 onChange={e => setQ(e.target.value)}
@@ -138,41 +188,33 @@ export default function MessagesPage() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1 scrollbar-hide">
+          <div className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5 scrollbar-hide">
             {filteredChats.length ? filteredChats.map(c => {
               const cId = c.id || c._id;
               const name = c.student ? `${c.student.firstName} ${c.student.lastName}` : (c.name || 'Student');
-              // const campus = c.student ? c.student.campus : ''
               const avatar = c.student?.profileImage?.url || c.avatar;
-              const listingName = c.item?.name || c.listing || 'Listing';
-              const unread = (c.messages || []).filter(m => m.senderType === 'STUDENT' && !m.isRead).length;
-              const rawLastMsg = c.lastMessage;
+              const unread = (c.messages || []).filter(m => !isMine(m) && !m.isRead).length;
               const validMessages = (c.messages || []).filter(m => !isSystemMsg(m));
-              const lastMsg = validMessages.length > 0 ? validMessages[validMessages.length - 1] : (rawLastMsg && !isSystemMsg(rawLastMsg) ? rawLastMsg : null);
-              const when = lastMsg?.createdAt ? new Date(lastMsg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : (c.when || '');
+              const lastMsg = validMessages.length > 0 ? validMessages[validMessages.length - 1] : null;
+              const when = lastMsg?.createdAt ? new Date(lastMsg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : (c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '');
               const isActive = cId === activeIdString;
 
               return (
                 <button key={cId} onClick={() => openChat(cId)}
-                  className={`w-full flex items-center gap-3.5 p-3 rounded-[16px] text-left cursor-pointer transition-all duration-200 group ${
-                    isActive ? 'bg-primary/5 shadow-sm border border-primary/10' : 'bg-transparent border border-transparent hover:bg-bg'
+                  className={`w-full flex items-center gap-3.5 p-3 rounded-[12px] text-left cursor-pointer transition-all duration-200 group ${
+                    isActive ? 'bg-[#f0f2f5]' : 'bg-transparent hover:bg-[#f5f6f8]'
                   }`}>
-                  <div className="relative flex-shrink-0 shadow-sm2 rounded-full">
+                  <div className="relative flex-shrink-0 rounded-full overflow-hidden">
                     <Avatar color="#0d7a72" name={name} url={avatar} size={50} />
-                    {c.online && <span className="absolute bottom-0 right-0 w-[14px] h-[14px] rounded-full bg-ok border-[3px] border-surface shadow-sm2" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline justify-between mb-0.5">
                       <span className="font-semibold text-[15px] text-ink tracking-tight truncate pr-2">{name}</span>
                       <span className={`text-[12px] font-medium flex-shrink-0 ${unread ? 'text-primary font-bold' : 'text-muted'}`}>{when}</span>
                     </div>
-                    {/* <div className="flex items-center gap-1.5 mb-1">
-                      <Icon name="tag" size={12} color="#0d7a72" />
-                      <span className="text-[12.5px] font-medium text-primary-600 truncate">{listingName}</span>
-                    </div> */}
                     <div className="flex items-center gap-2">
                       <span className={`text-[13px] leading-snug truncate flex-1 ${unread ? 'font-bold text-ink' : 'font-medium text-muted'}`}>
-                        {lastMsg ? ((lastMsg.senderType === 'AGENT' || lastMsg.from === 'me' ? 'You: ' : '') + (lastMsg.content || lastMsg.text)) : 'Waiting for student...'}
+                        {lastMsg ? ((isMine(lastMsg) ? 'You: ' : '') + lastMsg.content) : 'Waiting for student...'}
                       </span>
                       {unread > 0 && (
                         <span className="flex-shrink-0 min-w-[20px] h-[20px] px-1.5 rounded-full bg-primary text-white text-[11px] font-bold flex items-center justify-center shadow-sm">
@@ -196,30 +238,26 @@ export default function MessagesPage() {
         </div>
 
         {/* RIGHT PANE: Thread View */}
-        <div className={`flex-1 flex-col min-w-0 bg-white/40 ${!id ? 'hidden md:flex' : 'flex'} relative`}>
+        <div className={`flex-1 flex-col min-w-0 bg-[#efeae2] ${!id ? 'hidden md:flex' : 'flex'} relative`}>
           {activeChat ? (
             (() => {
               const name = activeChat.student ? `${activeChat.student.firstName} ${activeChat.student.lastName}` : (activeChat.name || 'Student');
               const avatar = activeChat.student?.profileImage?.url || activeChat.avatar;
-              const listingName = activeChat.item?.name || activeChat.listing || 'Listing';
+              const listingName = activeChat.itemCategory || 'Listing';
 
               return (
                 <div className="absolute inset-0 flex flex-col z-10 overflow-hidden">
                   {/* Header */}
-                  <div className="flex-none flex items-center gap-3 px-4 md:px-6 py-3 bg-surface border-b border-line shadow-sm2 z-20">
+                  <div className="flex-none flex items-center gap-3 px-4 md:px-6 py-3 bg-white border-b border-line shadow-sm z-20">
                     <button onClick={() => navigate('/messages')} aria-label="Back"
-                      className="md:hidden w-10 h-10 flex-shrink-0 rounded-full text-ink flex items-center justify-center hover:bg-bg transition-colors -ml-2 mr-1">
+                      className="md:hidden w-10 h-10 flex-shrink-0 rounded-full text-ink flex items-center justify-center hover:bg-[#f0f2f5] transition-colors -ml-2 mr-1">
                       <Icon name="chevronLeft" size={24} />
                     </button>
-                    <div className="relative flex-shrink-0 shadow-sm2 rounded-full">
+                    <div className="relative flex-shrink-0 rounded-full overflow-hidden">
                       <Avatar color="#0d7a72" name={name} url={avatar} size={44} />
-                      {activeChat.online && <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-ok border-[2.5px] border-surface shadow-sm2" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[16.5px] font-bold text-ink tracking-tight leading-tight truncate">{name}</div>
-                      {/* <div className={`text-[12px] font-medium leading-tight mt-0.5 ${activeChat.online ? 'text-ok' : 'text-muted'}`}>
-                        {activeChat.online ? 'Online now' : 'Offline'}
-                      </div> */}
+                      <div className="text-[16px] font-bold text-ink tracking-tight leading-tight truncate">{name}</div>
                     </div>
                     <div className="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10">
                       <Icon name="tag" size={14} color="#0d7a72" />
@@ -256,19 +294,19 @@ export default function MessagesPage() {
                   <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 md:px-8 py-6">
                     <div className="flex flex-col max-w-[800px] mx-auto">
                       {activeMessages.map((m, i) => {
-                        const mDate = m.createdAt || m.when;
+                        const mDate = m.createdAt;
                         const prevM = activeMessages[i - 1];
                         const nextM = activeMessages[i + 1];
                         
-                        const showDemarcation = i === 0 || !isSameDay(mDate, prevM?.createdAt || prevM?.when);
-                        const nextDate = nextM?.createdAt || nextM?.when;
+                        const showDemarcation = i === 0 || !isSameDay(mDate, prevM?.createdAt);
+                        const nextDate = nextM?.createdAt;
                         const isSameSenderAsNext = nextM && isMine(m) === isMine(nextM) && isSameDay(mDate, nextDate);
                         
                         return (
-                          <div key={m._id || i} className="flex flex-col w-full">
+                          <div key={m.id || m._id || i} className="flex flex-col w-full">
                             {showDemarcation && (
                               <div className="text-center mb-5 mt-4 first:mt-2">
-                                <span className="inline-block px-3 py-1 bg-surface border border-line rounded-full shadow-sm text-[11px] font-extrabold text-muted uppercase tracking-wider">
+                                <span className="inline-block px-3 py-1 bg-white border border-[#e8ebeb] rounded-full shadow-[0_1px_2px_rgba(0,0,0,0.05)] text-[11px] font-bold text-muted uppercase tracking-wider">
                                   {getDemarcation(mDate)}
                                 </span>
                               </div>
@@ -283,27 +321,27 @@ export default function MessagesPage() {
                   </div>
 
                   {/* Grounded Input Console */}
-                  <div className="flex-none bg-surface border-t border-line px-4 md:px-8 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-4px_24px_rgba(20,32,30,0.02)]">
+                  <div className="flex-none bg-[#f0f2f5] border-t border-line px-4 md:px-8 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
                     <div className="flex items-end gap-3 max-w-[800px] mx-auto">
                       <button aria-label="Add photo"
-                        className="w-12 h-12 flex-shrink-0 rounded-full text-muted hover:text-primary hover:bg-primary/5 flex items-center justify-center transition-all bg-bg shadow-sm border border-line cursor-pointer">
-                        <Icon name="camera" size={22} />
+                        className="w-[42px] h-[42px] flex-shrink-0 rounded-full text-muted hover:text-ink flex items-center justify-center transition-all bg-transparent cursor-pointer">
+                        <Icon name="camera" size={24} />
                       </button>
-                      <div className="flex-1 flex items-end bg-bg border border-line shadow-sm rounded-[24px] pl-5 pr-1.5 py-1.5 focus-within:border-primary/40 focus-within:ring-4 focus-within:ring-primary/10 transition-all">
+                      <div className="flex-1 flex items-end bg-white border border-transparent shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-[20px] pl-4 pr-1.5 py-1.5 focus-within:border-primary/40 focus-within:ring-4 focus-within:ring-primary/10 transition-all">
                         <textarea
                           value={draft}
                           onChange={e => setDraft(e.target.value)}
                           rows={1}
                           disabled={!hasStudentMessage}
-                          placeholder={hasStudentMessage ? "Type your message..." : "Waiting for student..."}
+                          placeholder={hasStudentMessage ? "Type a message" : "Waiting for student..."}
                           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-                          className={`flex-1 resize-none border-none bg-transparent py-3 font-[inherit] text-[15.5px] leading-[1.4] max-h-32 text-ink outline-none font-medium ${!hasStudentMessage ? 'placeholder:text-faint cursor-not-allowed' : 'placeholder:text-muted'}`}
+                          className={`flex-1 resize-none border-none bg-transparent py-2.5 font-[inherit] text-[15.5px] leading-[1.4] max-h-32 text-ink outline-none font-medium ${!hasStudentMessage ? 'placeholder:text-[#c0c5c5] cursor-not-allowed' : 'placeholder:text-muted'}`}
                         />
                         <button onClick={send} disabled={!draft.trim() || !hasStudentMessage}
-                          className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 mb-0.5 ml-2 shadow-sm ${
-                            draft.trim() && hasStudentMessage ? 'bg-primary cursor-pointer text-white hover:bg-primary-600' : 'bg-surface border border-line cursor-not-allowed text-faint'
+                          className={`w-[38px] h-[38px] rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 mb-0.5 ml-2 ${
+                            draft.trim() && hasStudentMessage ? 'bg-primary text-white cursor-pointer hover:bg-primary-600' : 'bg-transparent text-[#c0c5c5] cursor-not-allowed'
                           }`}>
-                          <Icon name="send" size={17} style={{ transform: 'translateX(-1px)' }} />
+                          <Icon name="send" size={20} style={{ transform: 'translateX(-1px)' }} />
                         </button>
                       </div>
                     </div>

@@ -1,42 +1,80 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Switch from '../../../components/Switch';
-import Icon from '../../../components/Icon';
 import AppBar from '../../../components/AppBar';
 import Layout from '../../../components/Layout';
+import Icon from '../../../components/Icon';
 import { useApp } from '../../../context/AppContext';
 
-import NotifToggle from '../../../components/settings/NotifToggle';
+function SettingToggle({ label, desc, active, onToggle }) {
+  return (
+    <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-black/[0.02] transition-colors" onClick={onToggle}>
+      <div className="flex-1 pr-4">
+        <div className="font-semibold text-ink text-[14.5px]">{label}</div>
+        <div className="text-muted text-[13px] leading-snug mt-0.5">{desc}</div>
+      </div>
+      <div className={`w-11 h-6 rounded-full flex items-center px-0.5 transition-colors duration-300 ${active ? 'bg-primary' : 'bg-line'}`}>
+        <div className={`w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-300 ${active ? 'translate-x-5' : 'translate-x-0'}`} />
+      </div>
+    </div>
+  );
+}
 
 export default function NotifSettings() {
   const navigate = useNavigate();
   const { flash } = useApp();
-  const [s, setS] = useState({ req: true, msg: true, approve: true, views: false, tips: false, pushAll: true, emailAll: true });
-  const set = k => v => { setS(p => ({ ...p, [k]: v })); flash('Preference saved'); };
+
+  const handleToggle = () => {
+    flash('Settings will be saved automatically');
+  }
 
   return (
     <Layout>
-      <div className="flex flex-col h-full">
-        <AppBar title="Notification settings" onBack={() => navigate('/profile')} />
-        <div className="flex-1 overflow-y-auto">
-          <div className="px-[18px] pb-7 pt-4">
-            <div className="text-[11px] font-extrabold tracking-[0.09em] uppercase text-primary mb-2.5">Channels</div>
-            <div className="bg-white rounded-card border border-line2 shadow-sm2 overflow-hidden mb-4">
-              <NotifToggle icon="bell"  label="Push notifications"  sub="On this device"        on={s.pushAll}  onChange={set('pushAll')} />
-              <NotifToggle icon="mail"  label="Email notifications" sub="adaeze@sunrise.ng"     on={s.emailAll} onChange={set('emailAll')} last />
+      <div className="flex flex-col h-full bg-bg">
+        <AppBar title="Notifications" onBack={() => navigate('/profile')} />
+        <div className="flex-1 overflow-y-auto mt-2 px-4 pb-8">
+          <div className="max-w-xl mx-auto w-full">
+            <div className="text-[11px] font-extrabold tracking-widest uppercase text-primary mb-3 mt-4 ml-1">
+              Push Notifications
+            </div>
+            <div className="bg-white rounded-card border border-line shadow-sm overflow-hidden mb-6">
+              <SettingToggle 
+                label="New Requests" 
+                desc="Get notified when a student requests an item" 
+                active={true}
+                onToggle={handleToggle}
+              />
+              <div className="h-px bg-line mx-4" />
+              <SettingToggle 
+                label="Chat Messages" 
+                desc="Alerts for new student messages" 
+                active={true}
+                onToggle={handleToggle}
+              />
+              <div className="h-px bg-line mx-4" />
+              <SettingToggle 
+                label="Reviews & Ratings" 
+                desc="When someone leaves a review on your item" 
+                active={true}
+                onToggle={handleToggle}
+              />
             </div>
 
-            <div className="text-[11px] font-extrabold tracking-[0.09em] uppercase text-primary mb-2.5">Activity</div>
-            <div className="bg-white rounded-card border border-line2 shadow-sm2 overflow-hidden mb-4">
-              <NotifToggle icon="requests" label="Reservation requests" sub="When a student wants to book"   on={s.req}     onChange={set('req')} />
-              <NotifToggle icon="message"  label="New messages"         sub="Replies from students"          on={s.msg}     onChange={set('msg')} />
-              <NotifToggle icon="check"    label="Listing approvals"    sub="When a listing goes live"       on={s.approve} onChange={set('approve')} />
-              <NotifToggle icon="eye"      label="Weekly views digest"  sub="Profile & listing view summary" on={s.views}   onChange={set('views')} last />
+            <div className="text-[11px] font-extrabold tracking-widest uppercase text-primary mb-3 mt-4 ml-1">
+              Email Notifications
             </div>
-
-            <div className="text-[11px] font-extrabold tracking-[0.09em] uppercase text-primary mb-2.5">More</div>
-            <div className="bg-white rounded-card border border-line2 shadow-sm2 overflow-hidden">
-              <NotifToggle icon="bolt" label="Tips & product news" sub="Occasional, never spammy" on={s.tips}   onChange={set('tips')} last />
+            <div className="bg-white rounded-card border border-line shadow-sm overflow-hidden">
+              <SettingToggle 
+                label="Weekly Summary" 
+                desc="A digest of your activity and performance" 
+                active={false}
+                onToggle={handleToggle}
+              />
+              <div className="h-px bg-line mx-4" />
+              <SettingToggle 
+                label="Product Updates" 
+                desc="News about Camproxi features and changes" 
+                active={true}
+                onToggle={handleToggle}
+              />
             </div>
           </div>
         </div>

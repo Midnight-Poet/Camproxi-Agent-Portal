@@ -3,18 +3,32 @@ import Icon from '../../components/Icon';
 import AppBar from '../../components/AppBar';
 import EmptyState from '../../components/EmptyState';
 import Layout from '../../components/Layout';
-import { useApp } from '../../context/AppContext';
+import { useNotification } from '../../context/NotificationContext';
+import { useMarkNotificationReadMutation, useMarkAllNotificationsReadMutation } from '../../redux/api/notificationsApiSlice';
 
 const NOTIF_META = {
   REQUEST_CREATED: { icon: 'requests', colorCls: 'text-primary-700', bgCls: 'bg-primary-50' },
   REQUEST_UPDATED: { icon: 'check',    colorCls: 'text-ok',          bgCls: 'bg-ok-bg' },
   REVIEW_CREATED:  { icon: 'star',     colorCls: 'text-primary-700', bgCls: 'bg-primary-50' },
+  CHAT:            { icon: 'chat',     colorCls: 'text-blue-600',    bgCls: 'bg-blue-50' },
   system:          { icon: 'info',     colorCls: 'text-muted',       bgCls: 'bg-gone-bg' },
 };
 
 export default function Notifications() {
   const navigate = useNavigate();
-  const { notifs, clearNotifs, unreadCount, markNotifRead, isLoadingNotifs } = useApp();
+  const { notifs, unreadCount, isLoadingNotifs, markNotifReadSocket, clearNotifsSocket } = useNotification();
+  const [markReadApi] = useMarkNotificationReadMutation();
+  const [markAllReadApi] = useMarkAllNotificationsReadMutation();
+
+  const handleMarkAllRead = () => {
+    clearNotifsSocket();
+    markAllReadApi();
+  }
+
+  const handleMarkRead = (id) => {
+    markNotifReadSocket(id);
+    markReadApi(id);
+  }
 
   return (
     <Layout>
@@ -24,7 +38,7 @@ export default function Notifications() {
           sub={`You have ${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}`}
           action={notifs.length > 0 ? (
             <button 
-              onClick={() => clearNotifs()}
+              onClick={handleMarkAllRead}
               className="text-[13px] font-bold text-primary bg-primary-tint px-4 py-1.5 rounded-full hover:bg-primary/20 transition-colors"
             >
               Mark all as read
@@ -60,13 +74,16 @@ export default function Notifications() {
                       {i > 0 && <div className="h-px bg-white/40" />}
                       <div onClick={() => {
                         if (!isRead) {
-                          markNotifRead(notifId);
-                        }if (type === 'REQUEST_CREATED' || type === 'REQUEST_UPDATED') {
+                          handleMarkRead(notifId);
+                        }
+                        if (n.link) {
+                            navigate(n.link);
+                        } else if (type === 'REQUEST_CREATED' || type === 'REQUEST_UPDATED') {
                           navigate('/requests');
                         } else if (type === 'REVIEW_CREATED' && n.itemId) {
                           navigate(`/listings/${n.itemId}`);
                         } else {
-                          navigate('/profile/reviews');
+                          navigate('/profile');
                         }
                       }}
                         className={`group flex gap-3 p-[15px] sm:p-5 relative transition-all duration-200 cursor-pointer ${!isRead ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-white/40'}`}>
@@ -92,7 +109,7 @@ export default function Notifications() {
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation();
-                                markNotifRead(notifId);
+                                handleMarkRead(notifId);
                               }}
                               className="absolute right-0 p-1.5 bg-white text-primary rounded-full shadow-sm2 opacity-0 group-hover:opacity-100 hover:bg-primary hover:text-white transition-all transform scale-90 group-hover:scale-100"
                               title="Mark as read"

@@ -24,6 +24,7 @@ export default function Icon({ name, size = 20, color = 'currentColor', stroke =
     wrench: <><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></>,
     plus: <><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
     check: <><polyline points="20,6 9,17 4,12"/></>,
+    checkCheck: <><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></>,
     x: <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
     chevronRight: <><polyline points="9,18 15,12 9,6"/></>,
     chevronLeft: <><polyline points="15,18 9,12 15,6"/></>,

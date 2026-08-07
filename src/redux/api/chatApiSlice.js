@@ -31,9 +31,27 @@ export const chatApiSlice = apiSlice.injectEndpoints({
 				method: 'PATCH',
 				body: {},
 			}),
-			// Instead of invalidating 'Chats', which causes a refetch,
-			// optimistic updates might be better or just invalidate.
-			invalidatesTags: ['Chats'],
+			async onQueryStarted(chatId, { dispatch, queryFulfilled }) {
+				const patchResult = dispatch(
+					apiSlice.util.updateQueryData('getChats', undefined, (draftChats) => {
+						const arr = Array.isArray(draftChats) ? draftChats : (draftChats?.data || draftChats?.chats || []);
+						const chat = arr.find(c => String(c.id || c._id) === String(chatId));
+						if (chat && chat.messages) {
+							chat.messages.forEach(m => {
+								const isMine = m.senderType === 'AGENT' || m.senderModel === 'AGENT' || m.from === 'me';
+								if (!isMine) {
+									m.isRead = true;
+								}
+							});
+						}
+					})
+				);
+				try {
+					await queryFulfilled;
+				} catch {
+					patchResult.undo();
+				}
+			}
 		}),
 	}),
 });

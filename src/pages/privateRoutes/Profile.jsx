@@ -85,18 +85,18 @@ export default function Profile() {
 									onClick={() => navigate('/profile/edit')}
 								/>
 								<ProfileRow
+									icon='bell'
+									label='Notification settings'
+									onClick={() =>
+										navigate('/profile/notifications')
+									}
+								/>
+								<ProfileRow
 									icon='shield'
 									label='Verification'
 									value='Verified'
 									onClick={() =>
 										navigate('/profile/verification')
-									}
-								/>
-								<ProfileRow
-									icon='bell'
-									label='Notification settings'
-									onClick={() =>
-										navigate('/profile/notifications')
 									}
 								/>
 								{/* <ProfileRow
